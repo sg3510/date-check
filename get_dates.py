@@ -113,7 +113,7 @@ if __name__ == '__main__':
 				print str(e) + '\nFailed, maybe CAPTCHA turned up?'
 		else:
 			print "Not checking"
-		time.sleep(hour_sec + hour_sec*random.gauss(1,0.5))
+		time.sleep(hour_sec + hour_sec*random.gauss(1.3,0.5))
 
 
 		# dates = get_dates()
