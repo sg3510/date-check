@@ -9,8 +9,9 @@
     "maxMonth": 4,
     "maxDay": 30,
     "emailTo":"you@example.com",
+    "emailName":"James",
     "emailFrom":"me@example.com",
-    "emailSubject":"DVLA Records authentification",
+    "emailSubject":"DVLA Practical Test notification",
     "smtpFromUsername":"me",
     "smtpFromPassword":"mypassword",
     "smtpServer":"smtp.example.com"

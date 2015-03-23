@@ -52,6 +52,8 @@ def get_dates():
 	response = br.submit()
 	soup = BeautifulSoup(response.read())
 
+	dates = []
+
 	dt_min = datetime.datetime(conf['minYear'], conf['minMonth'], conf['minDay'])
 	dt_max = datetime.datetime(conf['maxYear'], conf['maxMonth'], conf['maxDay'])
 
@@ -59,35 +61,41 @@ def get_dates():
 		# time.strptime(a.contents[0], "%A %d %B %Y %I:%M%p")
 		dt = datetime.datetime(*time.strptime(a.contents[0], "%A %d %B %Y %I:%M%p")[:6])
 		if (dt_min < dt) and (dt_max > dt):
-			print "found!"
-			print a.contents[0]
+			print "found: "+a.contents[0]
+			dates.append(a.contents[0])
 		# print a.contents[0]
+	return dates
 
-def send_mail():
+def send_mail(dates):
 	import smtplib
 	from email.MIMEMultipart import MIMEMultipart
 	from email.MIMEText import MIMEText
 	msg = MIMEMultipart()
-	msg['From'] = 'me@gmail.com'
-	msg['To'] = 'you@gmail.com'
-	msg['Subject'] = 'simple email in python'
-	message = 'here is the email'
+	msg['From'] = conf['emailFrom']
+	msg['To'] = conf['emailTo']
+	msg['Subject'] = conf['emailSubject']
+	message = 'Hey '+ conf['emailName'] + ',\nThe available dates found are:\n'
+	for date in dates:
+		message = message + date + '\n'
+	message = message + 'Be sure to book ASAP. \nhttps://www.gov.uk/book-driving-test \nKind Regards, \nDVLA Checker Bot'
 	msg.attach(MIMEText(message))
 
-	mailserver = smtplib.SMTP('smtp.gmail.com',587)
+	mailserver = smtplib.SMTP(conf['smtpServer'],587)
 	# identify ourselves to smtp gmail client
 	mailserver.ehlo()
 	# secure our email with tls encryption
 	mailserver.starttls()
 	# re-identify ourselves as an encrypted connection
 	mailserver.ehlo()
-	mailserver.login('me@gmail.com', 'mypassword')
+	mailserver.login(str(conf['smtpFromUsername']), str(conf['smtpFromPassword']))
 
-	mailserver.sendmail('me@gmail.com','you@gmail.com',msg.as_string())
+	mailserver.sendmail(conf['emailFrom'],conf['emailTo'],msg.as_string())
 
 	mailserver.quit()
 
 
 
 if __name__ == '__main__':
-	get_dates()
+	# dates = get_dates()
+	dates = ['Friday 27 March 2015 10:14am']
+	send_mail(dates)
