@@ -103,6 +103,7 @@ def send_mail(dates):
 if __name__ == '__main__':
 	print "Welcome "+conf['emailName']+", I'll be checking the DVLA for dates that suit you."
 	print "I'll be senging emails from "+conf['emailFrom']+" to "+conf['emailTo']+'.'
+
 	dt_min = datetime.datetime(conf['minYear'], conf['minMonth'], conf['minDay'])
 	dt_max = datetime.datetime(conf['maxYear'], conf['maxMonth'], conf['maxDay'])
 	print "I'm looking for dates between "+dt_min.strftime('%A %d %B')+ " and "+dt_max.strftime('%A %d %B')
@@ -110,7 +111,7 @@ if __name__ == '__main__':
 	while True:
 		now = datetime.datetime.now()
 		now_time = now.time()
-		if datetime.time(7,30) <= now.time() <= datetime.time(21,30):        
+		if datetime.time(7,30) <= now.time() <= datetime.time(22,30):        
 			print "* Checking DVLA"
 			try:
 				dates = get_dates()
@@ -122,7 +123,9 @@ if __name__ == '__main__':
 				print str(e) + '\n/!\Failed, maybe CAPTCHA turned up?'
 		else:
 			print "* Not checking due to time"
-		time.sleep(hour_sec + hour_sec*random.gauss(1.3,0.5))
+		wait_time = hour_sec + hour_sec*random.gauss(1.3,0.5)
+		time.sleep(wait_time)
+		print '* Waiting %.2f hours before retrying' % wait_time/3600
 
 
 		# dates = get_dates()
