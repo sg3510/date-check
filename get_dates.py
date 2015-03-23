@@ -8,14 +8,16 @@ import random
 with open('settings.conf') as data_file:
 	conf = json.load(data_file)
 
+hour_sec = 60*60
+
 def get_dates():
 	br = mechanize.Browser()
 	br.set_handle_robots(False)
-	br.addheaders = [('User-agent', 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.1) Gecko/2008071615 Fedora/3.0.1-1.fc9 Firefox/3.0.1')]
+	br.addheaders = [('User-agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/600.1.25 (KHTML, like Gecko) Version/8.0 Safari/600.1.25')]
 	br.open("https://driverpracticaltest.direct.gov.uk/application?execution=e1s1")
 
 	# Wait random period to avoid CAPTCHAs
-	time.sleep(1 + random.randrange(12,245)/100.0)
+	time.sleep(1 + random.randrange(92,545)/100.0)
 
 
 	br.select_form(nr=0)
@@ -24,7 +26,7 @@ def get_dates():
 	br.submit()
 	print br.geturl()
 
-	time.sleep(1 + random.randrange(12,245)/100.0)
+	time.sleep(1 + random.randrange(92,545)/100.0)
 
 	br.form = list(br.forms())[0]
 	br['driverLicenceNumber'] = conf['driverLicenceNumber']
@@ -32,20 +34,20 @@ def get_dates():
 	resp = br.submit()
 	print br.geturl()
 
-	time.sleep(1 + random.randrange(12,245)/100.0)
+	time.sleep(1 + random.randrange(92,545)/100.0)
 
 	br.form = list(br.forms())[0]
 	br['testCentreName'] = conf['testCentreName']
 	br.submit()
 	print br.geturl()
 
-	time.sleep(1 + random.randrange(12,245)/100.0)
+	time.sleep(1 + random.randrange(92,545)/100.0)
 
 	link = br.find_link(text_regex=r"Choose")
 	br.open(br.click_link(link))
 	print br.geturl()
 
-	time.sleep(1 + random.randrange(12,245)/100.0)
+	time.sleep(1 + random.randrange(92,545)/100.0)
 
 	br.form = list(br.forms())[0]
 	br['preferredTestDate'] = conf['preferredTestDate']
@@ -91,11 +93,29 @@ def send_mail(dates):
 
 	mailserver.sendmail(conf['emailFrom'],conf['emailTo'],msg.as_string())
 
+	print "Mail sent!"
+
 	mailserver.quit()
 
 
 
 if __name__ == '__main__':
-	# dates = get_dates()
-	dates = ['Friday 27 March 2015 10:14am']
-	send_mail(dates)
+	while True:
+		now = datetime.datetime.now()
+		now_time = now.time()
+		if datetime.time(7,30) <= now.time() <= datetime.time(21,30):        
+			print "Checking DVLA"
+			try:
+				dates = get_dates()
+				if dates:
+					send_mail(dates)
+			except Exception, e:
+				print str(e) + '\nFailed, maybe CAPTCHA turned up?'
+		else:
+			print "Not checking"
+		time.sleep(hour_sec + hour_sec*random.gauss(1,0.5))
+
+
+		# dates = get_dates()
+		# dates = ['Friday 27 March 2015 10:14am']
+		# send_mail(dates)
