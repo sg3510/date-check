@@ -124,8 +124,8 @@ if __name__ == '__main__':
 		else:
 			print "* Not checking due to time"
 		wait_time = hour_sec + hour_sec*random.gauss(1.3,0.5)
-		time.sleep(wait_time)
 		print '* Waiting %.2f hours before retrying' % wait_time/3600
+		time.sleep(wait_time)
 
 
 		# dates = get_dates()
