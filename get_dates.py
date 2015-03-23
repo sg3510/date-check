@@ -24,7 +24,7 @@ def get_dates():
 	br.form.find_control(name="testTypeCar", id='test-type-car')
 	br.method = "POST"
 	br.submit()
-	print br.geturl()
+	print "** "+br.geturl()
 
 	time.sleep(1 + random.randrange(92,545)/100.0)
 
@@ -32,20 +32,20 @@ def get_dates():
 	br['driverLicenceNumber'] = conf['driverLicenceNumber']
 	br['specialNeeds'] = ['false']
 	resp = br.submit()
-	print br.geturl()
+	print "** "+br.geturl()
 
 	time.sleep(1 + random.randrange(92,545)/100.0)
 
 	br.form = list(br.forms())[0]
 	br['testCentreName'] = conf['testCentreName']
 	br.submit()
-	print br.geturl()
+	print "** "+br.geturl()
 
 	time.sleep(1 + random.randrange(92,545)/100.0)
 
 	link = br.find_link(text_regex=r"Choose")
 	br.open(br.click_link(link))
-	print br.geturl()
+	print "** "+br.geturl()
 
 	time.sleep(1 + random.randrange(92,545)/100.0)
 
@@ -62,8 +62,9 @@ def get_dates():
 	for a in soup('ul')[1].findAll('span'):
 		# time.strptime(a.contents[0], "%A %d %B %Y %I:%M%p")
 		dt = datetime.datetime(*time.strptime(a.contents[0], "%A %d %B %Y %I:%M%p")[:6])
+		print '** - avail: '+a.contents[0]
 		if (dt_min < dt) and (dt_max > dt):
-			print "found: "+a.contents[0]
+			print "** found: "+a.contents[0]
 			dates.append(a.contents[0])
 		# print a.contents[0]
 	return dates
@@ -93,26 +94,34 @@ def send_mail(dates):
 
 	mailserver.sendmail(conf['emailFrom'],conf['emailTo'],msg.as_string())
 
-	print "Mail sent!"
+	print "** Mail sent!"
 
 	mailserver.quit()
 
 
 
 if __name__ == '__main__':
+	print "Welcome "+conf['emailName']+", I'll be checking the DVLA for dates that suit you."
+	print "I'll be senging emails from "+conf['emailFrom']+" to "+conf['emailTo']+'.'
+	dt_min = datetime.datetime(conf['minYear'], conf['minMonth'], conf['minDay'])
+	dt_max = datetime.datetime(conf['maxYear'], conf['maxMonth'], conf['maxDay'])
+	print "I'm looking for dates between "+dt_min.strftime('%A %d %B')+ " and "+dt_max.strftime('%A %d %B')
+
 	while True:
 		now = datetime.datetime.now()
 		now_time = now.time()
 		if datetime.time(7,30) <= now.time() <= datetime.time(21,30):        
-			print "Checking DVLA"
+			print "* Checking DVLA"
 			try:
 				dates = get_dates()
 				if dates:
 					send_mail(dates)
+				else:
+					print "** No dates found, maybe some will turn up next time?"
 			except Exception, e:
-				print str(e) + '\nFailed, maybe CAPTCHA turned up?'
+				print str(e) + '\n/!\Failed, maybe CAPTCHA turned up?'
 		else:
-			print "Not checking"
+			print "* Not checking due to time"
 		time.sleep(hour_sec + hour_sec*random.gauss(1.3,0.5))
 
 
