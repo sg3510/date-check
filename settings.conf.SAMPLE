@@ -7,5 +7,11 @@
     "minDay": 9,
     "maxYear": 2015,
     "maxMonth": 4,
-    "maxDay": 30
+    "maxDay": 30,
+    "emailTo":"you@example.com",
+    "emailFrom":"me@example.com",
+    "emailSubject":"DVLA Records authentification",
+    "smtpFromUsername":"me",
+    "smtpFromPassword":"mypassword",
+    "smtpServer":"smtp.example.com"
 }
