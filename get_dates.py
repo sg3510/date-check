@@ -62,10 +62,11 @@ def get_dates():
 	for a in soup('ul')[1].findAll('span'):
 		# time.strptime(a.contents[0], "%A %d %B %Y %I:%M%p")
 		dt = datetime.datetime(*time.strptime(a.contents[0], "%A %d %B %Y %I:%M%p")[:6])
-		print '** - avail: '+a.contents[0]
 		if (dt_min < dt) and (dt_max > dt):
-			print "** found: "+a.contents[0]
+			print "** - FOUND: "+a.contents[0]
 			dates.append(a.contents[0])
+		else:
+			print '** - avail: '+a.contents[0]
 		# print a.contents[0]
 	return dates
 
@@ -77,10 +78,10 @@ def send_mail(dates):
 	msg['From'] = conf['emailFrom']
 	msg['To'] = conf['emailTo']
 	msg['Subject'] = conf['emailSubject']
-	message = 'Hey '+ conf['emailName'] + ',\nThe available dates found are:\n'
+	message = 'Hey '+ conf['emailName'] + ',\n\nThe available dates found are:\n'
 	for date in dates:
 		message = message + date + '\n'
-	message = message + 'Be sure to book ASAP. \nhttps://www.gov.uk/book-driving-test \nKind Regards, \nDVLA Checker Bot'
+	message = message + 'Be sure to book ASAP. \nhttps://www.gov.uk/book-driving-test \n\nKind Regards, \nDVLA Checker Bot'
 	msg.attach(MIMEText(message))
 
 	mailserver = smtplib.SMTP(conf['smtpServer'],587)
@@ -124,7 +125,7 @@ if __name__ == '__main__':
 		else:
 			print "* Not checking due to time"
 		wait_time = hour_sec + hour_sec*random.gauss(1.3,0.5)
-		print '* Waiting %.2f hours before retrying' % (wait_time/3600.00)
+		print '* Waiting %.2f hours before retrying at %s' % ((wait_time/3600.00), (datetime.datetime.now()+datetime.timedelta(0,wait_time)).time().strftime("%I:%M:%S %p"))
 		time.sleep(wait_time)
 
 
