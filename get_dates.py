@@ -48,7 +48,6 @@ def get_dates_change():
 	dt_min = datetime.datetime(conf['minYear'], conf['minMonth'], conf['minDay'])
 	dt_max = datetime.datetime(conf['maxYear'], conf['maxMonth'], conf['maxDay'])
 
-	print soup('ul')[1].findAll('span')
 	for a in soup('ul')[1].findAll('span'):
 		dt = datetime.datetime(*time.strptime(a.contents[0], "%A %d %B %Y %I:%M%p")[:6])
 		if (dt_min < dt) and (dt_max > dt):
