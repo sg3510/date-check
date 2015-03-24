@@ -179,7 +179,7 @@ if __name__ == '__main__':
 		else:
 			print "* Not checking due to time"
 		wait_time = hour_sec + hour_sec*random.gauss(1.3,0.5)
-		print '* %f - Waiting %.2f hours before retrying at %s' % (datetime.datetime.utcnow().isoformat(), (wait_time/3600.00), (datetime.datetime.now()+datetime.timedelta(0,wait_time)).time().strftime("%I:%M:%S %p"))
+		print '* %s - Waiting %.2f hours before retrying at %s' % (datetime.datetime.utcnow().isoformat(), (wait_time/3600.00), (datetime.datetime.now()+datetime.timedelta(0,wait_time)).time().strftime("%I:%M:%S %p"))
 		time.sleep(wait_time)
 
 
