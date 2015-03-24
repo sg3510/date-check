@@ -180,8 +180,3 @@ if __name__ == '__main__':
 		wait_time = hour_sec + hour_sec*random.gauss(1.3,0.5)
 		print '* %s - Waiting %.2f hours before retrying at %s' % (datetime.datetime.utcnow().isoformat(), (wait_time/3600.00), (datetime.datetime.now()+datetime.timedelta(0,wait_time)).time().strftime("%I:%M:%S %p"))
 		time.sleep(wait_time)
-
-
-		# dates = get_dates_new()
-		# dates = ['Friday 27 March 2015 10:14am']
-		# send_mail(dates)
