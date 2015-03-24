@@ -11,10 +11,13 @@ with open('settings.conf') as data_file:
 hour_sec = 60*60
 
 def get_dates_change():
+	print "* Asking DVLA for a change of booking dates"
+
 	br = mechanize.Browser()
 	br.set_handle_robots(False)
 	br.addheaders = [('User-agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/600.1.25 (KHTML, like Gecko) Version/8.0 Safari/600.1.25')]
 	br.open("https://driverpracticaltest.direct.gov.uk/login")
+	print "** "+br.geturl()
 
 	# Wait random period to avoid CAPTCHAs
 	time.sleep(1 + random.randrange(92,545)/100.0)
@@ -23,6 +26,7 @@ def get_dates_change():
 	br['username'] = conf['driverLicenceNumber']
 	br['password'] = conf['applicationRefNumber']
 	br.submit()
+	print "** "+br.geturl()
 
 	# Wait random period to avoid CAPTCHAs
 	time.sleep(1 + random.randrange(92,545)/100.0)
@@ -36,6 +40,7 @@ def get_dates_change():
 
 	br.form = list(br.forms())[0]
 	response = br.submit()
+	print "** "+br.geturl()
 	soup = BeautifulSoup(response.read())
 
 	dates = []
@@ -43,8 +48,8 @@ def get_dates_change():
 	dt_min = datetime.datetime(conf['minYear'], conf['minMonth'], conf['minDay'])
 	dt_max = datetime.datetime(conf['maxYear'], conf['maxMonth'], conf['maxDay'])
 
+	print soup('ul')[1].findAll('span')
 	for a in soup('ul')[1].findAll('span'):
-		# time.strptime(a.contents[0], "%A %d %B %Y %I:%M%p")
 		dt = datetime.datetime(*time.strptime(a.contents[0], "%A %d %B %Y %I:%M%p")[:6])
 		if (dt_min < dt) and (dt_max > dt):
 			print "** - FOUND: "+a.contents[0]
@@ -55,6 +60,8 @@ def get_dates_change():
 	return dates
 
 def get_dates_new():
+	print "* Asking DVLA what booking dates are available"
+
 	br = mechanize.Browser()
 	br.set_handle_robots(False)
 	br.addheaders = [('User-agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/600.1.25 (KHTML, like Gecko) Version/8.0 Safari/600.1.25')]
@@ -159,7 +166,10 @@ if __name__ == '__main__':
 		if datetime.time(7,30) <= now.time() <= datetime.time(22,30):        
 			print "* Checking DVLA"
 			try:
-				dates = get_dates_new()
+				if conf['alreadyBooked']:
+					dates = get_dates_change()
+				else:
+					dates = get_dates_new()
 				if dates:
 					send_mail(dates)
 				else:
